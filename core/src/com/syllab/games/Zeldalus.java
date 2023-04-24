@@ -16,8 +16,13 @@ public class Zeldalus extends ApplicationAdapter {
 	public final static int MAP_SIDE = 19;
 	public final static int MAP_CENTER = MAP_SIDE/2;
 
-	public final static int CHARACTER_WIDTH  =32;
-	public final static int CHARACTER_HEIGHT =48;
+	public final static int CHARACTER_WIDTH  =48;
+	public final static int CHARACTER_HEIGHT =64;
+
+	public final static int CHARACTER_ANIM_LEFT  =3;
+	public final static int CHARACTER_ANIM_RIGHT =1;
+	public final static int CHARACTER_ANIM_UP    =0;
+	public final static int CHARACTER_ANIM_DOWN  =2;
 
 	public final static int BACKGROUND_TILE_WIDTH  = 16;
 	public final static int BACKGROUND_TILE_HEIGHT = 16;
@@ -37,9 +42,9 @@ public class Zeldalus extends ApplicationAdapter {
 	public final static int SCREEN_WIDTH  = MAP_CENTER * MAP_CELL_WIDTH + BACKGROUND_TILE_WIDTH;
 	public final static int SCREEN_HEIGHT = MAP_CENTER * MAP_CELL_HEIGHT + BACKGROUND_TILE_HEIGHT;
 
-	private final int DIRECTIONS = 4;
-	private final float CHARACTER_ANIM_SPEED = .1f;
-	private final float CHARACTER_SPEED = 150f;
+	private final static int DIRECTIONS = 4;
+	private final static float CHARACTER_ANIM_SPEED = .1f;
+	private final static float CHARACTER_SPEED = 150f;
 
 	// Game data
 	private final Random rand = new Random();
@@ -47,7 +52,7 @@ public class Zeldalus extends ApplicationAdapter {
 	private float gotoX, gotoY, characterX, characterY;
 	private float time = .0f;
 	private boolean resetting = true;
-	private int stop = 0;
+	private int stop;
 
 	// Graphical data
 	private SpriteBatch batch;
@@ -70,7 +75,7 @@ public class Zeldalus extends ApplicationAdapter {
 
 		animCharacter = new Animation[DIRECTIONS];
 		for(int i = 0; i<animCharacter.length; i++) {
-			animCharacter[i] = new Animation<TextureRegion>(
+			animCharacter[i] = new Animation<>(
 					CHARACTER_ANIM_SPEED,
 					txrCharacterTiles[i]
 			);
@@ -82,7 +87,7 @@ public class Zeldalus extends ApplicationAdapter {
 	public void render () {
 		// Init/Reset
 		if(resetting) {
-			stop = 0;
+			stop = CHARACTER_ANIM_DOWN;
 			gotoX=characterX= fromMapX(MAP_CENTER);
 			gotoY=characterY= fromMapY(MAP_CENTER);
 			for(int y=0; y<=MAP_CENTER; y++)
@@ -120,6 +125,7 @@ public class Zeldalus extends ApplicationAdapter {
 					gotoX=fromMapX(mapX+dx);
 					gotoY=fromMapY(mapY+dy);
 				}
+
 			}
 		}
 
@@ -129,10 +135,10 @@ public class Zeldalus extends ApplicationAdapter {
 
 		time += dt;
 		assert((gotoX==characterX)||(gotoY==characterY));
-		if(gotoX<characterX) { anim=1; characterX=Math.max(gotoX, characterX-CHARACTER_SPEED*dt); }
-		if(gotoX>characterX) { anim=2; characterX=Math.min(gotoX, characterX+CHARACTER_SPEED*dt); }
-		if(gotoY<characterY) { anim=0; characterY=Math.max(gotoY, characterY-CHARACTER_SPEED*dt); }
-		if(gotoY>characterY) { anim=3; characterY=Math.min(gotoY, characterY+CHARACTER_SPEED*dt); }
+		if(gotoX<characterX) { anim=CHARACTER_ANIM_LEFT ; characterX=Math.max(gotoX, characterX-CHARACTER_SPEED*dt); }
+		if(gotoX>characterX) { anim=CHARACTER_ANIM_RIGHT; characterX=Math.min(gotoX, characterX+CHARACTER_SPEED*dt); }
+		if(gotoY<characterY) { anim=CHARACTER_ANIM_DOWN ; characterY=Math.max(gotoY, characterY-CHARACTER_SPEED*dt); }
+		if(gotoY>characterY) { anim=CHARACTER_ANIM_UP   ; characterY=Math.min(gotoY, characterY+CHARACTER_SPEED*dt); }
 
 		// Render
 		batch.begin();
@@ -140,8 +146,8 @@ public class Zeldalus extends ApplicationAdapter {
 		{
 			for(int x=0; x<MAP_SIDE; x+=2)
 			{
-				float offsetX=(float) fromMapX(x);
-				float offsetY=(float) fromMapY(y);
+				float offsetX = fromMapX(x);
+				float offsetY = fromMapY(y);
 
 				assert(map[x][y]&&!map[x+1][y+1]);
 				batch.draw(txrBgWall, offsetX, offsetY);
@@ -167,7 +173,11 @@ public class Zeldalus extends ApplicationAdapter {
 			? txrCharacterTiles[stop][0]
 			: animCharacter[stop = anim].getKeyFrame(time, true);
 
-		batch.draw(txrCharacter, characterX-BACKGROUND_TILE_WIDTH/2, characterY);
+		batch.draw(
+			txrCharacter,
+			characterX+(BACKGROUND_TILE_WIDTH-CHARACTER_WIDTH)/2,
+			characterY
+		);
 		batch.end();
 	}
 	
