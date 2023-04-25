@@ -103,13 +103,15 @@ public class Daedalus {
         }
     }
 
-    public void tryMove(Vector2 pos, int dx, int dy, Vector2 destOut) {
+    public boolean tryMove(Vector2 pos, int dx, int dy, Vector2 destOut) {
         int mapX = toMapX(pos.x);
         int mapY = toMapY(pos.y);
 
-        if(!map[mapX+dx][mapY+dy]) {
-            destOut.set(fromMapX(mapX + dx), fromMapY(mapY + dy));
+        if(map[mapX+dx][mapY+dy]) {
+            return false;
         }
+        destOut.set(fromMapX(mapX + dx), fromMapY(mapY + dy));
+        return true;
     }
 
     public boolean isOnBorder(Vector2 pos) {
