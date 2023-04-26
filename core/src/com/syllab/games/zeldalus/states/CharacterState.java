@@ -8,5 +8,5 @@ public interface CharacterState {
     void create(TextureRegion[][] txrTiles);
     void update(Character c, float dt);
     void processInputs(Character c);
-    void rendrer(Character c, SpriteBatch batch);
+    void render(Character c, SpriteBatch batch);
 }

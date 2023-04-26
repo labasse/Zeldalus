@@ -72,7 +72,7 @@ public class Character {
     public void render(SpriteBatch batch, float dt) {
         currentState.update       (this, dt);
         currentState.processInputs(this);
-        currentState.rendrer      (this, batch);
+        currentState.render       (this, batch);
     }
 
     public void dispose() {
@@ -102,7 +102,7 @@ public class Character {
         return Direction.move(this.actual, this.destination, new Vector2(step, step));
     }
 
-    public void tryMoveToDestination(int dx, int dy) {
+    public void tryToMoveToDestination(int dx, int dy) {
         assert(((dx==0)||(dy==0))&&(dx>=-1)&&(dx<=1)&&(dy>=-1)&&(dy<=1));
         if((dx!=0 || dy!=0) && map.tryMove(actual, dx, dy, this.destination)) {
             changeState(Character.STATE_MOVING);

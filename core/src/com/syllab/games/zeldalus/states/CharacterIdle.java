@@ -32,11 +32,12 @@ public class CharacterIdle implements CharacterState {
             dx=Gdx.input.isKeyPressed(Input.Keys.LEFT) ? -1:1;
         else if(Gdx.input.isKeyPressed(Input.Keys.DOWN)||Gdx.input.isKeyPressed(Input.Keys.UP))
             dy=Gdx.input.isKeyPressed(Input.Keys.DOWN) ? -1:1;
-        c.tryMoveToDestination(dx, dy);
+        c.tryToMoveToDestination(dx, dy);
     }
 
     @Override
-    public void rendrer(Character c, SpriteBatch batch) {
+    public void render(Character c, SpriteBatch batch) {
+
         c.draw(batch, txrIdle[c.getIdleDirection()]);
     }
 }

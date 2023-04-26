@@ -43,7 +43,7 @@ public class CharacterMoving implements CharacterState {
         // Nothing to do
     }
     @Override
-    public void rendrer(Character c, SpriteBatch batch) {
+    public void render(Character c, SpriteBatch batch) {
         int anim = this.animationIds[c.walkToDestination(this.speed*this.dt)];
 
         this.time += this.dt;
