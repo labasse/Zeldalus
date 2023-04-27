@@ -1,4 +1,4 @@
-package com.syllab.games.zeldalus;
+package com.syllab.games.models;
 
 import com.syllab.games.utils.IntNumber;
 

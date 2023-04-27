@@ -1,52 +1,43 @@
 package com.syllab.games;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.syllab.games.controllers.CharacterOnCellController;
+import com.syllab.games.services.base.DisposableService;
+import com.syllab.games.services.base.ServiceHost;
+import com.syllab.games.services.base.UpdatableService;
+import com.syllab.games.services.GameService;
+import com.syllab.games.services.TimeService;
+import com.syllab.games.services.CharacterAssetsService;
+import com.syllab.games.services.DaedalusAssetsService;
+import com.syllab.games.services.gdx.GdxBatchService;
+import com.syllab.games.services.gdx.GdxControllerViewService;
+import com.syllab.games.utils.Direction;
 
-import com.syllab.games.views.CharacterView;
-import com.syllab.games.views.DaedalusView;
-import com.syllab.games.views.Drawable;
-import com.syllab.games.zeldalus.Character;
-import com.syllab.games.zeldalus.Daedalus;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 public class Zeldalus extends ApplicationAdapter {
-	private final Daedalus map;
-	private final Character character;
-	private final List<Drawable> drawables;
-
-	private SpriteBatch batch;
+	private final ServiceHost host;
 
 	public Zeldalus() {
-		this.map = new Daedalus();
-		this.character = new Character(map);
-		this.drawables = new ArrayList<>();
-		this.drawables.add(new DaedalusView(this.map));
-		this.drawables.add(new CharacterView(this.character));
+		this.host = new ServiceHost();
 	}
 	@Override
 	public void create () {
-		this.drawables.forEach(Drawable::create);
-		this.batch = new SpriteBatch();
+		Arrays.stream(new Object[]{
+			new CharacterAssetsService(),
+			new DaedalusAssetsService(),
+			new TimeService(),
+			new GameService(),
+			new GdxControllerViewService(new CharacterOnCellController(Direction.DOWN)),
+			new GdxBatchService()
+		}).forEach(this.host::register);
 	}
 	@Override
 	public void render () {
-		if(this.character.isOnBorder()) {
-			this.character.reset();
-			this.map.reset();
-		}
-		float dt = Gdx.graphics.getDeltaTime();
-
-		this.batch.begin();
-		this.drawables.forEach(d -> d.render(batch, dt));
-		this.batch.end();
+		this.host.getServices(UpdatableService.class).forEach(s -> s.update(this.host));
 	}
 	@Override
 	public void dispose () {
-		this.batch.dispose();
-		this.drawables.forEach(Drawable::dispose);
+		this.host.getServices(DisposableService.class).forEach(DisposableService::dispose);
 	}
 }
